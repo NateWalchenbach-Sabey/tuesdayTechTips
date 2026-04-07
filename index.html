@@ -395,14 +395,14 @@
       inset:0;
       pointer-events:none;
       overflow:hidden;
-      z-index:0;
+      z-index:3;
     }
     .celebration-layer{
       position:fixed;
       inset:0;
       pointer-events:none;
       overflow:hidden;
-      z-index:0;
+      z-index:2;
       opacity:0;
       transition:opacity .3s ease;
     }
@@ -701,6 +701,7 @@
 
     function renderQuestion() {
       clearConfetti();
+      clearCelebration();
       const q = questions[index];
       progressEl.textContent = `${index + 1} / ${questions.length}`;
       scoreEl.textContent = score;
@@ -791,8 +792,8 @@
     }
 
     function launchPerfectCelebration() {
-      launchDiscoLights();
       launchConfetti();
+      launchDiscoLights();
     }
 
     function launchDiscoLights() {
@@ -802,11 +803,11 @@
         <span class="disco-light right"></span>
       `;
       celebrationLayer.classList.add("active");
-      window.setTimeout(() => celebrationLayer.classList.remove("active"), 6500);
+      window.setTimeout(clearCelebration, 6500);
     }
 
     function launchConfetti() {
-      clearConfetti();
+      confettiLayer.innerHTML = "";
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
       const colors = ["#12395b", "#1f5f96", "#f2b544", "#2d7d46", "#b64034"];
@@ -828,9 +829,12 @@
     }
 
     function clearConfetti() {
+      confettiLayer.innerHTML = "";
+    }
+
+    function clearCelebration() {
       celebrationLayer.classList.remove("active");
       celebrationLayer.innerHTML = "";
-      confettiLayer.innerHTML = "";
     }
 
     safeBtn.addEventListener("click", () => answer(false));
