@@ -397,6 +397,46 @@
       overflow:hidden;
       z-index:0;
     }
+    .celebration-layer{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:0;
+      opacity:0;
+      transition:opacity .3s ease;
+    }
+    .celebration-layer.active{
+      opacity:1;
+    }
+    .disco-light{
+      position:absolute;
+      top:-20vh;
+      width:40vw;
+      height:140vh;
+      opacity:.42;
+      filter:blur(8px);
+      transform-origin:top center;
+      mix-blend-mode:screen;
+      clip-path:polygon(50% 0%, 100% 100%, 0% 100%);
+      animation:disco-swing 2.6s ease-in-out infinite alternate,
+        disco-pulse 1.2s ease-in-out infinite;
+    }
+    .disco-light.left{
+      left:-6vw;
+      background:linear-gradient(180deg, rgba(242,181,68,.95) 0%, rgba(242,181,68,0) 82%);
+      animation-delay:0s, .1s;
+    }
+    .disco-light.center{
+      left:30vw;
+      background:linear-gradient(180deg, rgba(31,95,150,.95) 0%, rgba(31,95,150,0) 82%);
+      animation-delay:.35s, .25s;
+    }
+    .disco-light.right{
+      right:-6vw;
+      background:linear-gradient(180deg, rgba(182,64,52,.95) 0%, rgba(182,64,52,0) 82%);
+      animation-delay:.7s, .4s;
+    }
     .confetti{
       position:absolute;
       top:-12px;
@@ -420,8 +460,17 @@
         opacity:.95;
       }
     }
+    @keyframes disco-swing{
+      0%{ transform:rotate(-22deg) scaleY(1); }
+      100%{ transform:rotate(22deg) scaleY(1.06); }
+    }
+    @keyframes disco-pulse{
+      0%, 100%{ opacity:.22; }
+      50%{ opacity:.56; }
+    }
 
     @media (prefers-reduced-motion: reduce){
+      .celebration-layer{ display:none; }
       .confetti{ display:none; }
     }
 
@@ -435,6 +484,7 @@
   </style>
 </head>
 <body>
+  <div id="celebrationLayer" class="celebration-layer" aria-hidden="true"></div>
   <div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
 
   <main class="wrap">
@@ -569,7 +619,7 @@
               </div>
               <div class="calendar-row">
                 <div>Organizer</div>
-                <div>Jordan Lee &lt;jordan.lee@sabey.com&gt;</div>
+                <div>Nate Walchenbach &lt;nate.walchenbach@sabey.com&gt;</div>
               </div>
               <div class="calendar-row">
                 <div>Location</div>
@@ -646,6 +696,7 @@
     const phishBtn = document.getElementById("phishBtn");
     const nextBtn = document.getElementById("nextBtn");
     const restartBtn = document.getElementById("restartBtn");
+    const celebrationLayer = document.getElementById("celebrationLayer");
     const confettiLayer = document.getElementById("confettiLayer");
 
     function renderQuestion() {
@@ -725,7 +776,7 @@
       if (perfect) {
         feedbackEl.textContent = "Excellent work. You earned 100%!";
         feedbackEl.className = "good";
-        launchConfetti();
+        launchPerfectCelebration();
       } else if (score >= 3) {
         feedbackEl.textContent = "Nice job. You caught most of the suspicious messages.";
         feedbackEl.className = "neutral";
@@ -737,6 +788,21 @@
       nextBtn.hidden = true;
       restartBtn.hidden = false;
       restartBtn.focus();
+    }
+
+    function launchPerfectCelebration() {
+      launchDiscoLights();
+      launchConfetti();
+    }
+
+    function launchDiscoLights() {
+      celebrationLayer.innerHTML = `
+        <span class="disco-light left"></span>
+        <span class="disco-light center"></span>
+        <span class="disco-light right"></span>
+      `;
+      celebrationLayer.classList.add("active");
+      window.setTimeout(() => celebrationLayer.classList.remove("active"), 6500);
     }
 
     function launchConfetti() {
@@ -762,6 +828,8 @@
     }
 
     function clearConfetti() {
+      celebrationLayer.classList.remove("active");
+      celebrationLayer.innerHTML = "";
       confettiLayer.innerHTML = "";
     }
 
